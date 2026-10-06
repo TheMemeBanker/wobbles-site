@@ -1,0 +1,82 @@
+/* wobbles.lol — pointer parallax, the boing, and confetti. No dependencies. */
+(() => {
+  const root = document.documentElement;
+  const stage = document.getElementById("stage");
+  const boing = document.getElementById("boing");
+  const name = document.getElementById("name");
+  const hint = document.getElementById("hint");
+  const confetti = document.getElementById("confetti");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const palette = ["#00bfe4", "#9b7fe6", "#b7e35f", "#f59ac0", "#ffffff", "#3b8be0"];
+
+  /* ---------- parallax: the stage tilts toward the pointer, layers slide by depth ---------- */
+  let tx = 0, ty = 0, cx = 0, cy = 0, lastMove = 0, raf = 0;
+  const setTarget = (x, y) => { tx = Math.max(-1, Math.min(1, x)); ty = Math.max(-1, Math.min(1, y)); lastMove = performance.now(); };
+  window.addEventListener("pointermove", (e) => {
+    const r = stage.getBoundingClientRect();
+    const x = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+    const y = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+    setTarget(x * 0.9, y * 0.9);
+  }, { passive: true });
+  window.addEventListener("pointerleave", () => setTarget(0, 0));
+  const tick = (now) => {
+    // when the pointer rests for 3s, Wobbles looks around on his own
+    if (now - lastMove > 3000) { const t = now / 1000; setTarget(Math.sin(t * .35) * .35, Math.cos(t * .27) * .22); lastMove = now - 3000; }
+    cx += (tx - cx) * 0.075; cy += (ty - cy) * 0.075;
+    root.style.setProperty("--rx", (cx * 7).toFixed(2) + "deg");
+    root.style.setProperty("--ry", (-cy * 5.5).toFixed(2) + "deg");
+    root.style.setProperty("--px", (cx * 11).toFixed(2));
+    root.style.setProperty("--py", (cy * 8).toFixed(2));
+    raf = requestAnimationFrame(tick);
+  };
+  if (!reduce) raf = requestAnimationFrame(tick);
+
+  /* ---------- the boing ---------- */
+  let hinted = false;
+  const wobble = (px, py) => {
+    boing.classList.remove("go"); void boing.offsetWidth; boing.classList.add("go");
+    [...name.children].forEach((s, i) => { s.classList.remove("jump"); void s.offsetWidth; setTimeout(() => s.classList.add("jump"), i * 45); });
+    if (!hinted) { hinted = true; hint.classList.add("gone"); }
+    if (!reduce) burst(px, py);
+  };
+  stage.addEventListener("pointerdown", (e) => { e.preventDefault(); wobble(e.clientX, e.clientY); });
+  stage.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); const r = stage.getBoundingClientRect(); wobble(r.left + r.width / 2, r.top + r.height / 2); } });
+  setTimeout(() => { if (!hinted) hint.classList.add("gone"); }, 9000);
+
+  /* ---------- confetti: a handful of soft shapes with real gravity ---------- */
+  const pieces = [];
+  let animating = false;
+  const burst = (x, y) => {
+    const n = 16 + Math.floor(Math.random() * 6);
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement("i");
+      const kind = Math.random() < .55 ? "dot" : Math.random() < .6 ? "sq" : "ring";
+      el.className = kind;
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      el.style.background = color; el.style.color = color;
+      const a = (-Math.PI / 2) + (Math.random() - .5) * Math.PI * 1.25;
+      const v = 7 + Math.random() * 9;
+      const s = .7 + Math.random() * .9;
+      pieces.push({ el, x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 360, vr: (Math.random() - .5) * 18, s, life: 1, born: performance.now() });
+      confetti.appendChild(el);
+    }
+    if (!animating) { animating = true; requestAnimationFrame(step); }
+  };
+  const step = (now) => {
+    for (let i = pieces.length - 1; i >= 0; i--) {
+      const p = pieces[i];
+      p.vy += .42; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      const age = (now - p.born) / 1000;
+      p.life = age < .75 ? 1 : Math.max(0, 1 - (age - .75) / .5);
+      p.el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotate(${p.r}deg) scale(${p.s * (0.6 + 0.4 * p.life)})`;
+      p.el.style.opacity = p.life;
+      if (p.life <= 0 || p.y > window.innerHeight + 40) { p.el.remove(); pieces.splice(i, 1); }
+    }
+    if (pieces.length) requestAnimationFrame(step); else animating = false;
+  };
+
+  /* ---------- a welcome wobble once he has loaded ---------- */
+  const hero = document.getElementById("hero");
+  const hello = () => setTimeout(() => { boing.classList.add("go"); }, 650);
+  if (hero.complete) hello(); else hero.addEventListener("load", hello, { once: true });
+})();

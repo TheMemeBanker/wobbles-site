@@ -1,0 +1,180 @@
+/* wobbles.lol — one character, big, alive. */
+:root {
+  --ink: #17405a;
+  --mute: #7fa0b3;
+  --cyan: #00bfe4;
+  --purple: #9b7fe6;
+  --lime: #b7e35f;
+  --pink: #f59ac0;
+  --sky-a: #f3fafd;
+  --sky-b: #e3f3fa;
+  --rx: 0deg; --ry: 0deg; --px: 0; --py: 0;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: radial-gradient(120% 90% at 50% 20%, var(--sky-a) 0%, var(--sky-b) 70%, #d9eef7 100%);
+  color: var(--ink);
+  font-family: "Baloo 2", "Nunito", "Segoe UI Rounded", system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ---- sky: slow drifting color blobs ---- */
+.sky { position: fixed; inset: 0; overflow: hidden; z-index: 0; }
+.blob { position: absolute; border-radius: 50%; filter: blur(72px); opacity: .55; will-change: transform; animation: drift var(--t, 24s) ease-in-out infinite alternate; }
+.b1 { width: 52vmin; height: 52vmin; left: -8vmin;  top: -6vmin;  background: var(--cyan);   --t: 26s; }
+.b2 { width: 46vmin; height: 46vmin; right: -10vmin; top: 8vmin;   background: var(--purple); --t: 31s; animation-delay: -9s; }
+.b3 { width: 40vmin; height: 40vmin; left: 10vmin;  bottom: -12vmin; background: var(--lime); --t: 23s; animation-delay: -4s; opacity: .45; }
+.b4 { width: 38vmin; height: 38vmin; right: 6vmin;  bottom: -8vmin;  background: var(--pink); --t: 29s; animation-delay: -14s; opacity: .45; }
+.b5 { width: 26vmin; height: 26vmin; left: 42vmin;  top: 4vmin;   background: #ffffff;       --t: 19s; animation-delay: -6s; opacity: .8; }
+.b6 { width: 30vmin; height: 30vmin; left: 55vmin;  bottom: 2vmin; background: var(--cyan);   --t: 27s; animation-delay: -20s; opacity: .3; }
+@keyframes drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(6vmin, -4vmin, 0) scale(1.08); }
+  100% { transform: translate3d(-5vmin, 5vmin, 0) scale(.96); }
+}
+
+/* ---- scene ---- */
+.scene {
+  position: relative; z-index: 1; width: 100%; overflow: hidden;
+  min-height: 100dvh;
+  display: grid; grid-template-rows: 1fr auto auto; justify-items: center; align-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+  gap: 0;
+}
+.stage {
+  width: min(100%, 72dvh * 962 / 912);
+  aspect-ratio: 962 / 912;
+  position: relative;
+  perspective: 1400px;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+}
+.stage:focus-visible .tilt { outline: 3px solid var(--cyan); outline-offset: 12px; border-radius: 40px; }
+.tilt {
+  position: absolute; inset: 0;
+  transform: rotateX(var(--ry)) rotateY(var(--rx));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.layer { position: absolute; inset: 0; will-change: transform; }
+.layer img { display: block; width: 100%; height: auto; pointer-events: none; }
+/* parallax: deeper layers (--d) move more with the pointer */
+.layer { transform: translate3d(calc(var(--px) * var(--d) * 1px), calc(var(--py) * var(--d) * 1px), 0); }
+.layer.piece img {
+  transform-origin: var(--ox) var(--oy);
+  animation: float var(--t) ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+.layer.aster img { animation: aster var(--t) ease-in-out infinite; animation-delay: var(--delay); }
+.layer.buddy img { animation: buddy var(--t) ease-in-out infinite; animation-delay: var(--delay); }
+@keyframes float {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  35%  { transform: translate3d(.35%, -1.3%, 0) scale(1.06); }
+  70%  { transform: translate3d(-.3%, .6%, 0) scale(.97); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes aster {
+  0%   { transform: rotate(0deg) translate3d(0, 0, 0); }
+  50%  { transform: rotate(14deg) translate3d(.3%, -1%, 0); }
+  100% { transform: rotate(0deg) translate3d(0, 0, 0); }
+}
+/* the green buddy keeps a tight orbit so the ring behind him never shows */
+@keyframes buddy {
+  0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  50%  { transform: translate3d(0, -.5%, 0) scale(1.045) rotate(-2.5deg); }
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+}
+
+/* ---- the body: sway > bob > jelly > boing ---- */
+.body .sway  { position: absolute; inset: 0; transform-origin: 50% 92%; animation: sway 6.4s ease-in-out infinite; }
+.body .bob   { position: absolute; inset: 0; animation: bob 3.4s ease-in-out infinite; }
+.body .jelly { position: absolute; inset: 0; transform-origin: 50% 88%; animation: jelly 3.4s ease-in-out infinite; }
+.body .boing { position: absolute; inset: 0; transform-origin: 50% 88%; }
+.body .boing.go { animation: boing .95s cubic-bezier(.22, 1.2, .36, 1) 1; }
+.hero { position: absolute; inset: 0; width: 100%; height: 100%; }
+@keyframes sway  { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
+@keyframes bob   { 0%,100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -1.6%, 0); } }
+@keyframes jelly {
+  0%   { transform: scale(1, 1); }
+  25%  { transform: scale(1.022, .978); }
+  50%  { transform: scale(.985, 1.018); }
+  75%  { transform: scale(1.012, .992); }
+  100% { transform: scale(1, 1); }
+}
+@keyframes boing {
+  0%   { transform: scale(1, 1); }
+  14%  { transform: scale(1.16, .84); }
+  32%  { transform: scale(.90, 1.12); }
+  50%  { transform: scale(1.06, .95); }
+  68%  { transform: scale(.98, 1.03); }
+  84%  { transform: scale(1.015, .99); }
+  100% { transform: scale(1, 1); }
+}
+
+/* ---- eyelids: body-colored, sampled from the pixels above and below each eye ---- */
+.lid {
+  position: absolute; border-radius: 50%;
+  transform: scaleY(0); transform-origin: 50% 0;
+  animation: blink 5.3s linear infinite;
+}
+.lid-l { left: 35.0%; top: 47.8%; width: 6.8%; height: 10.2%; background: linear-gradient(#2bc4e7, #00bce2); }
+.lid-r { left: 54.2%; top: 50.0%; width: 7.0%; height: 10.4%; background: linear-gradient(#00bfe4, #00badf); animation-delay: .06s; }
+@keyframes blink {
+  0%, 90.5% { transform: scaleY(0); }
+  92%, 95%  { transform: scaleY(1.02); }
+  96.5%, 100% { transform: scaleY(0); }
+}
+
+/* ---- ground shadow, breathing with the bob ---- */
+.shadow {
+  position: absolute; left: 24%; right: 20%; bottom: 4.5%; height: 7%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 50%, rgba(23, 64, 90, .26) 0%, rgba(23, 64, 90, .10) 45%, rgba(23, 64, 90, 0) 72%);
+  transform-origin: 50% 50%;
+  animation: shadow 3.4s ease-in-out infinite;
+  transform: translate3d(calc(var(--px) * -.4px), 0, 0);
+}
+@keyframes shadow { 0%,100% { transform: scale(1, 1); opacity: 1; } 50% { transform: scale(.9, .86); opacity: .8; } }
+
+/* ---- the name ---- */
+.name {
+  margin: 10px 0 0; font-weight: 800; letter-spacing: .005em; line-height: 1;
+  font-size: clamp(46px, 9.5vmin, 118px);
+  color: var(--ink);
+  display: flex; gap: 0; transform: translate3d(calc(var(--px) * .5px), 0, 0);
+}
+.name span { display: inline-block; transform-origin: 50% 100%; animation: pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
+.name span:nth-child(1) { animation-delay: .05s } .name span:nth-child(2) { animation-delay: .11s; color: var(--cyan); }
+.name span:nth-child(3) { animation-delay: .17s } .name span:nth-child(4) { animation-delay: .23s }
+.name span:nth-child(5) { animation-delay: .29s } .name span:nth-child(6) { animation-delay: .35s } .name span:nth-child(7) { animation-delay: .41s }
+.name span.jump { animation: jump .55s cubic-bezier(.2, 1.4, .4, 1) 1; }
+@keyframes pop  { 0% { transform: translateY(.6em) scale(.6); opacity: 0; } 60% { transform: translateY(-.08em) scale(1.08); opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes jump { 0% { transform: none; } 35% { transform: translateY(-.28em) scale(1.08, .92); } 70% { transform: translateY(.04em) scale(.96, 1.04); } 100% { transform: none; } }
+.hint { margin: 8px 0 0; font-size: clamp(13px, 1.8vmin, 17px); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); opacity: .9; transition: opacity .6s ease; animation: nudge 2.2s ease-in-out infinite; }
+.hint.gone { opacity: 0; animation: none; }
+@keyframes nudge { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+/* ---- confetti ---- */
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
+.confetti i { position: absolute; left: 0; top: 0; display: block; will-change: transform, opacity; }
+.confetti .dot  { width: 12px; height: 12px; border-radius: 50%; }
+.confetti .sq   { width: 11px; height: 11px; border-radius: 3px; }
+.confetti .ring { width: 14px; height: 14px; border-radius: 50%; border: 3px solid currentColor; background: transparent !important; }
+
+/* ---- small screens: taller stage, tighter type ---- */
+@media (max-width: 640px) {
+  .stage { width: min(100%, 64dvh * 962 / 912); }
+  .name { margin-top: 4px; }
+  .blob { filter: blur(48px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob, .layer.piece img, .layer.aster img, .layer.buddy img, .body .sway, .body .bob, .body .jelly, .shadow, .hint, .name span { animation: none !important; }
+  .lid { animation: none; }
+  .tilt { transform: none !important; }
+}

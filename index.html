@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>wobbles</title>
+<meta name="description" content="Say hi to Wobbles.">
+<link rel="icon" type="image/png" sizes="32x32" href="./img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="./img/favicon-64.png">
+<link rel="apple-touch-icon" href="./img/favicon-512.png">
+<meta property="og:title" content="wobbles">
+<meta property="og:description" content="Say hi to Wobbles.">
+<meta property="og:image" content="https://wobbles.lol/img/og.png">
+<meta property="og:url" content="https://wobbles.lol/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#eef7fb">
+<link rel="preload" as="image" href="./img/base.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<div class="sky" aria-hidden="true">
+  <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i><i class="blob b4"></i><i class="blob b5"></i><i class="blob b6"></i>
+</div>
+
+<main class="scene">
+  <div class="stage" id="stage" role="button" tabindex="0" aria-label="Wobbles. Tap to make him wobble.">
+    <div class="tilt" id="tilt">
+      <div class="shadow" aria-hidden="true"></div>
+
+      <div class="layer piece orb orb-gray"   style="--d:1.7; --ox:7.9%;  --oy:37.5%; --t:5.1s; --delay:-1.2s"><img src="./img/orb-gray.png" alt="" draggable="false"></div>
+      <div class="layer piece aster"           style="--d:1.35;--ox:18.4%; --oy:19.7%; --t:7.5s; --delay:-3s"><img src="./img/asterisk.png" alt="" draggable="false"></div>
+      <div class="layer piece orb orb-purple" style="--d:1.55;--ox:37.6%; --oy:11.8%; --t:4.3s; --delay:-0.6s"><img src="./img/orb-purple.png" alt="" draggable="false"></div>
+      <div class="layer piece orb orb-green"  style="--d:1.45;--ox:67.2%; --oy:13.2%; --t:3.7s; --delay:-2.1s"><img src="./img/orb-green.png" alt="" draggable="false"></div>
+      <div class="layer piece orb orb-blue"   style="--d:1.75;--ox:50.3%; --oy:89.3%; --t:4.9s; --delay:-1.7s"><img src="./img/orb-blue.png" alt="" draggable="false"></div>
+
+      <div class="layer body" style="--d:1">
+        <div class="sway"><div class="bob"><div class="jelly" id="jelly"><div class="boing" id="boing">
+          <img class="hero" id="hero" src="./img/base.png" alt="Wobbles, a smiling blue blob with two little friends" draggable="false" width="962" height="912">
+          <i class="lid lid-l" aria-hidden="true"></i>
+          <i class="lid lid-r" aria-hidden="true"></i>
+        </div></div></div></div>
+      </div>
+
+      <div class="layer piece buddy" style="--d:1.15; --ox:78.4%; --oy:21.3%; --t:4.6s; --delay:-1.9s"><img src="./img/green.png" alt="" draggable="false"></div>
+    </div>
+  </div>
+
+  <h1 class="name" id="name" aria-label="wobbles">
+    <span>w</span><span>o</span><span>b</span><span>b</span><span>l</span><span>e</span><span>s</span>
+  </h1>
+  <p class="hint" id="hint">tap him</p>
+</main>
+
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script src="./app.js"></script>
+</body>
+</html>
