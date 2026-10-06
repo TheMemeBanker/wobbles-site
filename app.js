@@ -38,8 +38,13 @@
     if (!reduce) burst(px, py);
   };
   /* ---------- the address bubble: only when you tap the big blue guy himself ---------- */
-  const bubble = document.getElementById("bubble"), addr = document.getElementById("addr"), copyHint = document.getElementById("copyHint");
-  let bubbleTimer = 0;
+  const bubble = document.getElementById("bubble");
+  let addr, copyHint, bubbleTimer = 0;
+  const buildBubble = () => {            // nothing about the address exists in the page until he is tapped
+    if (addr) return;
+    bubble.innerHTML = '<span class="bubble-tag">$wobwob</span><code class="bubble-addr" id="addr"></code><span class="bubble-hint" id="copyHint"></span>';
+    addr = document.getElementById("addr"); copyHint = document.getElementById("copyHint");
+  };
   const onBody = (clientX, clientY) => {
     const r = stage.getBoundingClientRect();
     const x = (clientX - r.left) / r.width, y = (clientY - r.top) / r.height;
@@ -47,7 +52,7 @@
     return dx * dx + dy * dy <= 1;
   };
   const showBubble = () => {
-    clearTimeout(bubbleTimer);
+    buildBubble(); clearTimeout(bubbleTimer);
     bubble.classList.remove("out", "copied");
     if (WOBWOB_MINT) { addr.textContent = WOBWOB_MINT; addr.classList.remove("soon"); copyHint.textContent = "tap to copy"; }
     else { addr.textContent = "address coming soon"; addr.classList.add("soon"); copyHint.textContent = ""; }
