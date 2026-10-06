@@ -4,7 +4,6 @@
   const stage = document.getElementById("stage");
   const boing = document.getElementById("boing");
   const name = document.getElementById("name");
-  const hint = document.getElementById("hint");
   const confetti = document.getElementById("confetti");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const palette = ["#00bfe4", "#9b7fe6", "#b7e35f", "#f59ac0", "#ffffff", "#3b8be0"];
@@ -33,11 +32,9 @@
   if (!reduce) raf = requestAnimationFrame(tick);
 
   /* ---------- the boing ---------- */
-  let hinted = false;
   const wobble = (px, py) => {
     boing.classList.remove("go"); void boing.offsetWidth; boing.classList.add("go");
     [...name.children].forEach((s, i) => { s.classList.remove("jump"); void s.offsetWidth; setTimeout(() => s.classList.add("jump"), i * 45); });
-    if (!hinted) { hinted = true; hint.classList.add("gone"); }
     if (!reduce) burst(px, py);
   };
   /* ---------- the address bubble: only when you tap the big blue guy himself ---------- */
@@ -77,7 +74,6 @@
     if (onBody(e.clientX, e.clientY)) { if (bubble.hidden) showBubble(); else hideBubble(); }
   });
   stage.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); const r = stage.getBoundingClientRect(); wobble(r.left + r.width / 2, r.top + r.height / 2); } });
-  setTimeout(() => { if (!hinted) hint.classList.add("gone"); }, 9000);
 
   /* ---------- confetti: a handful of soft shapes with real gravity ---------- */
   const pieces = [];

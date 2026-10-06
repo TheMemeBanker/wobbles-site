@@ -155,9 +155,6 @@ body {
 .name span.jump { animation: jump .55s cubic-bezier(.2, 1.4, .4, 1) 1; }
 @keyframes pop  { 0% { transform: translateY(.6em) scale(.6); opacity: 0; } 60% { transform: translateY(-.08em) scale(1.08); opacity: 1; } 100% { transform: none; opacity: 1; } }
 @keyframes jump { 0% { transform: none; } 35% { transform: translateY(-.28em) scale(1.08, .92); } 70% { transform: translateY(.04em) scale(.96, 1.04); } 100% { transform: none; } }
-.hint { margin: 8px 0 0; font-size: clamp(13px, 1.8vmin, 17px); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); opacity: .9; transition: opacity .6s ease; animation: nudge 2.2s ease-in-out infinite; }
-.hint.gone { opacity: 0; animation: none; }
-@keyframes nudge { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
 /* ---- confetti ---- */
 .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden; }
