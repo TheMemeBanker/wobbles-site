@@ -177,6 +177,7 @@ body {
 }
 
 /* ---- the address bubble: pops out of Wobbles when you tap him ---- */
+.bubble[hidden] { display: none !important; }
 .bubble {
   position: absolute; left: 64%; top: 40%; z-index: 4;
   max-width: min(58%, 420px);
