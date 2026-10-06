@@ -178,3 +178,38 @@ body {
   .lid { animation: none; }
   .tilt { transform: none !important; }
 }
+
+/* ---- the address bubble: pops out of Wobbles when you tap him ---- */
+.bubble {
+  position: absolute; left: 64%; top: 40%; z-index: 4;
+  max-width: min(58%, 420px);
+  padding: 14px 16px 12px;
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 2px solid var(--cyan);
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(23, 64, 90, .18), 0 2px 0 rgba(255,255,255,.9) inset;
+  display: flex; flex-direction: column; gap: 6px;
+  transform-origin: 8% 100%;
+  animation: bubble-in .62s cubic-bezier(.2, 1.4, .35, 1) both;
+  cursor: pointer; user-select: none; text-align: left;
+}
+.bubble::before { /* the tail, aimed at his mouth */
+  content: ""; position: absolute; left: 10px; bottom: -12px; width: 20px; height: 20px;
+  background: inherit; border: 2px solid var(--cyan); border-top: 0; border-left: 0;
+  border-radius: 0 0 6px 0; transform: rotate(45deg);
+}
+.bubble.out { animation: bubble-out .28s ease-in both; }
+.bubble-tag { font-weight: 800; font-size: clamp(16px, 2.4vmin, 22px); letter-spacing: .03em; color: var(--cyan); line-height: 1; }
+.bubble-addr { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: clamp(11px, 1.55vmin, 14px); color: var(--ink); word-break: break-all; line-height: 1.45; }
+.bubble-addr.soon { font-family: inherit; font-weight: 800; color: var(--mute); letter-spacing: .04em; text-transform: uppercase; font-size: clamp(11px, 1.5vmin, 13px); }
+.bubble-hint { font-size: clamp(10px, 1.3vmin, 12px); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); min-height: 1.2em; }
+.bubble.copied { border-color: var(--lime); }
+.bubble.copied .bubble-hint { color: #5a9a12; }
+@keyframes bubble-in  { 0% { transform: scale(.2) rotate(-8deg); opacity: 0; } 60% { transform: scale(1.06) rotate(1.5deg); opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes bubble-out { 0% { transform: none; opacity: 1; } 100% { transform: scale(.6); opacity: 0; } }
+@media (max-width: 640px) {
+  .bubble { left: 50%; top: 2%; transform-origin: 50% 100%; max-width: 88%; translate: -50% 0; }
+  .bubble::before { left: calc(50% - 10px); }
+  @keyframes bubble-in  { 0% { transform: scale(.2); opacity: 0; } 60% { transform: scale(1.06); opacity: 1; } 100% { transform: none; opacity: 1; } }
+}

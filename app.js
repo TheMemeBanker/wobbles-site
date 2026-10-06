@@ -8,6 +8,7 @@
   const confetti = document.getElementById("confetti");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const palette = ["#00bfe4", "#9b7fe6", "#b7e35f", "#f59ac0", "#ffffff", "#3b8be0"];
+  const WOBWOB_MINT = null; // set on the operator's link, after on-chain verification
 
   /* ---------- parallax: the stage tilts toward the pointer, layers slide by depth ---------- */
   let tx = 0, ty = 0, cx = 0, cy = 0, lastMove = 0, raf = 0;
@@ -39,7 +40,42 @@
     if (!hinted) { hinted = true; hint.classList.add("gone"); }
     if (!reduce) burst(px, py);
   };
-  stage.addEventListener("pointerdown", (e) => { e.preventDefault(); wobble(e.clientX, e.clientY); });
+  /* ---------- the address bubble: only when you tap the big blue guy himself ---------- */
+  const bubble = document.getElementById("bubble"), addr = document.getElementById("addr"), copyHint = document.getElementById("copyHint");
+  let bubbleTimer = 0;
+  const onBody = (clientX, clientY) => {
+    const r = stage.getBoundingClientRect();
+    const x = (clientX - r.left) / r.width, y = (clientY - r.top) / r.height;
+    const dx = (x - 0.50) / 0.27, dy = (y - 0.60) / 0.29;   // ellipse over his body
+    return dx * dx + dy * dy <= 1;
+  };
+  const showBubble = () => {
+    clearTimeout(bubbleTimer);
+    bubble.classList.remove("out", "copied");
+    if (WOBWOB_MINT) { addr.textContent = WOBWOB_MINT; addr.classList.remove("soon"); copyHint.textContent = "tap to copy"; }
+    else { addr.textContent = "address coming soon"; addr.classList.add("soon"); copyHint.textContent = ""; }
+    bubble.hidden = false; void bubble.offsetWidth;
+    bubbleTimer = setTimeout(hideBubble, 12000);
+  };
+  const hideBubble = () => {
+    if (bubble.hidden) return;
+    bubble.classList.add("out");
+    setTimeout(() => { bubble.hidden = true; bubble.classList.remove("out"); }, 280);
+  };
+  const copyAddr = async () => {
+    if (!WOBWOB_MINT) return;
+    try { await navigator.clipboard.writeText(WOBWOB_MINT); }
+    catch { const t = document.createElement("textarea"); t.value = WOBWOB_MINT; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); } catch {} t.remove(); }
+    bubble.classList.add("copied"); copyHint.textContent = "copied";
+    clearTimeout(bubbleTimer); bubbleTimer = setTimeout(hideBubble, 2200);
+  };
+  bubble.addEventListener("pointerdown", (e) => { e.stopPropagation(); e.preventDefault(); copyAddr(); });
+  document.addEventListener("pointerdown", (e) => { if (!bubble.hidden && !bubble.contains(e.target) && !stage.contains(e.target)) hideBubble(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideBubble(); });
+  stage.addEventListener("pointerdown", (e) => {
+    e.preventDefault(); wobble(e.clientX, e.clientY);
+    if (onBody(e.clientX, e.clientY)) { if (bubble.hidden) showBubble(); else hideBubble(); }
+  });
   stage.addEventListener("keydown", (e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); const r = stage.getBoundingClientRect(); wobble(r.left + r.width / 2, r.top + r.height / 2); } });
   setTimeout(() => { if (!hinted) hint.classList.add("gone"); }, 9000);
 
