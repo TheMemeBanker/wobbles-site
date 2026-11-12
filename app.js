@@ -71,7 +71,7 @@
   let addr, copyHint, bubbleTimer = 0;
   const buildBubble = () => {            // nothing about the address exists in the page until he is tapped
     if (addr) return;
-    bubble.innerHTML = '<span class="bubble-tag">$wobwob</span><code class="bubble-addr" id="addr"></code><span class="bubble-hint" id="copyHint"></span>';
+    bubble.innerHTML = '<span class="bubble-tag">$WOB</span><code class="bubble-addr" id="addr"></code><span class="bubble-hint" id="copyHint"></span>';
     addr = document.getElementById("addr"); copyHint = document.getElementById("copyHint");
   };
   const onBody = (clientX, clientY) => {
