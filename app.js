@@ -7,7 +7,7 @@
   const confetti = document.getElementById("confetti");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const palette = ["#00bfe4", "#9b7fe6", "#b7e35f", "#f59ac0", "#ffffff", "#3b8be0"];
-  const WOBWOB_MINT = null; // set on the operator's link, after on-chain verification; null = no bubble at all
+  const WOBWOB_MINT = "9nVN2n5R1QZkPNTDQAPe6Evy3kYkCnB4Qeh6cpQJpump"; // set on the operator's link, after on-chain verification; null = no bubble at all
 
   /* ---------- parallax: the stage tilts toward the pointer, layers slide by depth ---------- */
   let tx = 0, ty = 0, cx = 0, cy = 0, lastMove = 0, raf = 0;
